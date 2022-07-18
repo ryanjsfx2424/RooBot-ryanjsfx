@@ -1,4 +1,5 @@
 """Module for the Verify cog."""
+import ast
 import asyncio
 import contextlib
 import logging
@@ -38,9 +39,16 @@ class Verify(commands.Cog):
         self.config = Config.get_conf(self, 195375142061211648, force_registration=True)
         self.config.register_member(**self.default_member_settings)
         self.config.register_user(**self.default_user_settings)
-        
 
+        frare = "rarities_rarity-tools_roo-troop.txt"
+        with open(frare, "r") as fid:
+            self.rarities = fid.read()
+        # end with
+        self.rarities = ast.literal_eval(self.rarities)
         
+        self.super_roo_url = "https://cc_nftstore.mypinata.cloud/ipfs/QmX2Jf52HcRBoGEP6i6xptdHCF1Caa6iM6X3Zi1jSTvPHb"
+        self.base_roo_url = "https://cc_nftstore.mypinata.cloud/ipfs/QmPZXdpP1sZj67GgevEr2W93bB1D7XcmySLKrMmNDGL4FP/"
+        self.URL = "https://cdn.discordapp.com/attachments/965394881067515914/980589091718586428/4431.png"
         
     @checks.mod_or_permissions(manage_roles=True)   
     @commands.command()
@@ -57,6 +65,56 @@ class Verify(commands.Cog):
             file=discord.File(stream, filename=f"urls.md"),
             delete_after=3000,
         )
+
+    @commands.command()
+    async def roorarity(self, ctx: commands.Context, rooid):
+        if ctx.channel.id == 930236283815620668 or ctx.channel.id == 894352684138778654:
+            rooid = str(rooid) # b/c idk if it'd be an int or str...
+            if rooid != "5501":
+                ctx.send("sry only super roo rarity while testing")
+                return
+            # end if
+        
+            name1 = "Roo #" + rooid
+            name2 = "Roo Troop #" + rooid
+        
+            if "super" in rooid.lower() or "5501" == rooid:
+                name = "Super Roo #1 - Jungle Roo"
+            else:
+                name = name1
+            # end if
+
+            for ii in range(len(self.rarities)):
+                if  name1 == self.rarities[ii] or \
+                    name2 == self.rarities[ii] or \
+                    name  == self.rarities[ii]:
+                    
+                    title = "**__rank of " + name + "=> " + str(ii+1) + "__**"
+                    description = "\u200b"
+                    print(self.rarities[ii])
+
+
+                    if "super" in name.lower():
+                        image_url = self.super_roo_url
+                        fname = "5501.png"
+                    else:
+                        image_url = self.base_roo_url + num + ".webp"
+                        fname = str(num).zfill(5) + ".webp"
+                    # end if/else
+
+                    embed = interactions.Embed(title=title, description=description,)
+                    embed.set_footer(text = "Built for Roo Troop, Powered by @yunggodNFT",
+                                    icon_url=self.URL)
+                    #home = os.getcwd()
+                    #os.chdir("/Users/ryanjsfx/Documents/RooPunks/IMAGES/root/")
+                    await ctx.send(embeds=embed, ephemeral=True)
+                    #os.chdir(home)
+                    return
+                # end if
+            # end for
+        else:
+            return
+       
 
     @commands.command()
     async def rarity(self, ctx: commands.Context, joeyid):    
